@@ -61,4 +61,12 @@ try {
 } catch (err) {
   fail(`could not copy ${source} to ${target}: ${(err as Error).message}`);
 }
-console.log(`main.ts: copied ${POST_FILE} to ${target}`);
+// Verify the copy landed intact before the grader reads it: read the target
+// back and confirm it matches the source byte for byte.
+const sourceText = readFileSync(source, 'utf8');
+const copiedText = readFileSync(target, 'utf8');
+if (copiedText !== sourceText) {
+  fail(`${target} does not match ${source} after copy`);
+}
+const postUrl = (JSON.parse(copiedText) as Record<string, unknown>).url;
+console.log(`main.ts: copied ${POST_FILE} to ${target} (post: ${postUrl})`);
